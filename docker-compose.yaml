@@ -1,0 +1,42 @@
+version: '3.8'
+services:
+  jenkins-server:
+    build:
+      context: jenkins-server/
+      args:
+        JENKINS_VERSION: $JENKINS_VERSION
+    hostname: jenkins-server
+    container_name: jenkins-server
+    ports:
+      - "8080:8080"
+    volumes:
+      - type: bind
+        source: ./data/jenkins-server
+        target: /var/jenkins_home
+    networks:
+      - jenkins-network
+
+  jenkins-agent:
+    build:
+      context: jenkins-agent/
+      args:
+        JENKINS_AGENT_VERSION: $JENKINS_AGENT_VERSION
+    hostname: jenkins-agent
+    container_name: jenkins-agent
+    environment:
+      JENKINS_URL: http://jenkins-server:8080/
+      JENKINS_SECRET: $JENKINS_AGENT_TOKEN # token
+      JENKINS_AGENT_NAME: "JenkinsAgent"
+      JENKINS_AGENT_WORKDIR: /home/jenkins/agent
+    volumes:
+      - type: bind
+        source: ./data/jenkins-agent
+        target: /home/jenkins/agent
+    networks:
+      - jenkins-network
+    depends_on:
+      - jenkins
+
+networks:
+  jenkins-network:
+    driver: bridge
