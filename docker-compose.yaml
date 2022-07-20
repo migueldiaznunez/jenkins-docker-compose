@@ -35,7 +35,7 @@ services:
     networks:
       - jenkins-network
     depends_on:
-      - jenkins
+      - jenkins-server
 
 networks:
   jenkins-network:
